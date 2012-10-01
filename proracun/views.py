@@ -29,28 +29,22 @@ extratitles_en = {
 }
 
 def sankey_js(request, po, leto, date):
-	# handler = {
-	# 	'prihodki': Prihodki(),
-	# 	'odhodki': Odhodki(),
-	# 	}[po]
-	
-	# date = datetime.datetime.strptime(date, '%Y-%m-%d')
-	
-	# records = [(p.sifra, p.naziv, p.znesek) for p in Postavka.objects.filter(proracun__proracunsko_leto=leto, proracun__datum_sprejetja=date,
-	# 	sifra__lt=10000)]
-	# struct = handler(records)
-	# json = simplejson.dumps(struct, ensure_ascii=True, use_decimal=True, indent=4)
-
 	# prihodek - codes = (70, 71, 72, 73, 74, 78, 75, 50)
 	# odhodek  - codes = (40, 41, 42, 43, 45, 44, 55, 57)
 
 	nodes = []
 	links = []
 
+	c = 0
 	for p in Postavka.objects.filter(proracun__proracunsko_leto=leto, proracun__datum_sprejetja=date,
 		sifra__gte=10, sifra__lt=100):
 		if p.znesek < 10: continue
-		nodes.append({'name':"%s - %s" % (p.sifra, p.naziv)})
+		nodes.append(
+			{'name':"%s - %s" % (p.sifra, p.naziv,),
+			 'id': c
+			}
+		)
+		c += 1
 
 	for p in Postavka.objects.filter(proracun__proracunsko_leto=leto, proracun__datum_sprejetja=date,
 		sifra__gte=100, sifra__lt=1000):
@@ -59,18 +53,14 @@ def sankey_js(request, po, leto, date):
 
 		source = str(p.sifra)[:2] + ' '
 
-		c = 0
 		for item in nodes:
-			
 			if item['name'][:3] == source:
-				print source, item['name'][:3]
-				print c, len(nodes)-1
 				links.append({
-					"source":c,
-					"target":len(nodes)-1,
+					"source":len(nodes)-1,
+					"target": item['id'],
+
 					"value": p.znesek,
 					})
-				print p.znesek
 				break
 			c += 1
 

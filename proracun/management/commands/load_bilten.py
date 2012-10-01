@@ -107,6 +107,8 @@ class Command(BaseCommand):
 			
 			for pr in proracuni.itervalues():
 				Postavka(proracun=pr, sifra=57, naziv=u'Plačila obresti', naziv_en=u'Interest payments', znesek=0).save()
+		@transaction.commit_on_success
+		def go2():
 			print 'Postprocessing...'
 			from django.db import connection
 			cur = connection.cursor()
@@ -127,4 +129,5 @@ class Command(BaseCommand):
 			cur.execute('''UPDATE proracun_postavka SET znesek = 0.0 WHERE id IN (SELECT a.id FROM proracun_postavka a, proracun_proracun b WHERE a.proracun_id = b.id AND sifra::text ~ E'^50.$');''')
 			
 		# end function body
-		return go()
+		#go()
+		go2()

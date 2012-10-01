@@ -1,5 +1,5 @@
 function init() {
-    var json = {{ json }};
+    var json = {{ json|safe }};
     TM.Squarified.implement({
         'setColor': function(json) {
             return json.data.$color;

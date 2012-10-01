@@ -49,10 +49,12 @@ def sankey_js(request, po, leto, date):
 
 	for p in Postavka.objects.filter(proracun__proracunsko_leto=leto, proracun__datum_sprejetja=date,
 		sifra__gte=10, sifra__lt=100):
+		if p.znesek < 10: continue
 		nodes.append({'name':"%s - %s" % (p.sifra, p.naziv)})
 
 	for p in Postavka.objects.filter(proracun__proracunsko_leto=leto, proracun__datum_sprejetja=date,
 		sifra__gte=100, sifra__lt=1000):
+		if p.znesek < 10: continue
 		nodes.append({'name':"%s - %s" % (p.sifra, p.naziv)})
 
 		source = str(p.sifra)[:2] + ' '

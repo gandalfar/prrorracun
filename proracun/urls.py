@@ -22,6 +22,9 @@ urlpatterns = patterns('',
     # areachart
     url(r'^stuff/20letSlovenije/proracun_area_(?P<po>(:?prihodki|odhodki))_(?:(?P<language>(?:sl|en))_)?(?P<sifra>\d+)_(?P<inflacija>...)\.js$', 'proracun.views.areachart_js', name='proracun_areachart_js'),
     url(r'^stuff/20letSlovenije/(?:(?P<language>en)/)?(?P<po>(:?prihodki|odhodki))/(?P<inflacija>...)/$', 'proracun.views.areachart', name='proracun_areachart'),
+    #sankey
+    url(r'^s/(?P<po>(:?prihodki|odhodki))/(?P<leto>\d{4})/(?P<date>\d{4}-\d\d-\d\d)/$', 'proracun.views.sankey', name='proracun_sankey'),
+    url(r'^s/proracun_(?P<po>(:?prihodki|odhodki))_(?P<leto>\d{4})_(?P<date>\d{4}-\d\d-\d\d)\.json$', 'proracun.views.sankey_js', name='proracun_sankey_js'),
 )
 
 

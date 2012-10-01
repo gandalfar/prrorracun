@@ -28,6 +28,70 @@ extratitles_en = {
 	'bdp': u'(GDP growth adjusted)',
 }
 
+def sankey_js(request, po, leto, date):
+	# handler = {
+	# 	'prihodki': Prihodki(),
+	# 	'odhodki': Odhodki(),
+	# 	}[po]
+	
+	# date = datetime.datetime.strptime(date, '%Y-%m-%d')
+	
+	# records = [(p.sifra, p.naziv, p.znesek) for p in Postavka.objects.filter(proracun__proracunsko_leto=leto, proracun__datum_sprejetja=date,
+	# 	sifra__lt=10000)]
+	# struct = handler(records)
+	# json = simplejson.dumps(struct, ensure_ascii=True, use_decimal=True, indent=4)
+
+	# prihodek - codes = (70, 71, 72, 73, 74, 78, 75, 50)
+	# odhodek  - codes = (40, 41, 42, 43, 45, 44, 55, 57)
+
+	nodes = []
+	links = []
+
+	for p in Postavka.objects.filter(proracun__proracunsko_leto=leto, proracun__datum_sprejetja=date,
+		sifra__gte=10, sifra__lt=100):
+		nodes.append({'name':"%s - %s" % (p.sifra, p.naziv)})
+
+	for p in Postavka.objects.filter(proracun__proracunsko_leto=leto, proracun__datum_sprejetja=date,
+		sifra__gte=100, sifra__lt=1000):
+		nodes.append({'name':"%s - %s" % (p.sifra, p.naziv)})
+
+		source = str(p.sifra)[:2] + ' '
+
+		c = 0
+		for item in nodes:
+			
+			if item['name'][:3] == source:
+				print source, item['name'][:3]
+				print c, len(nodes)-1
+				links.append({
+					"source":c,
+					"target":len(nodes)-1,
+					"value": p.znesek,
+					})
+				print p.znesek
+				break
+			c += 1
+
+	data = {
+		"nodes": nodes,
+		"links": links,
+	}
+	json = simplejson.dumps(data)
+	
+	context = {'json': mark_safe(json)}
+	return render_to_response("sankey.json", RequestContext(request, context), mimetype='text/javascript')
+
+
+def sankey(request, po, leto, date):
+	context = {
+		'po': po,
+		'leto': leto,
+		'date': date,
+		'js_vizualizacija_url': reverse('proracun_sankey_js', args=(po, leto, date)),
+		}
+	return render_to_response("sankey.html", RequestContext(request, context))
+
+
 def treemap_js(request, po, leto, date):
 	handler = {
 		'prihodki': Prihodki(),
